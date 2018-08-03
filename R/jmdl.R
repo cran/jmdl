@@ -116,6 +116,7 @@ jmdl <- function(formula, data = NULL, q = 2, theta = NULL, W.appendix = NULL,
                  c(args, list(family=family),list(offset=offset),list(theta=theta)))
 
   lth <- length(opt$par)
+  n   <- dim(args$X)[1]
   lb  <- dim(args$X)[2]
   if(is.null(W.appendix)){
     qq = q
@@ -139,13 +140,15 @@ jmdl <- function(formula, data = NULL, q = 2, theta = NULL, W.appendix = NULL,
   p    <- NULL
   lp   <- list(p)
 
-  for(i in 1:lth){
-    ptest <- p.test(c(i), c(0), opt, std, family=family)
+  for(i in 1:lb){
+    ptest <- p.test(c(i), c(0), opt, std, n, lb, family=family)
     tval[i] <- ptest$tval
     p[i]  <- ptest$pval
   }
-  ltval <- list(tbeta=tval[1:lb], tdelta=tval[lb+1], tgamma=tval[(lth-qq):lth])
-  lp <- list(pbeta=p[1:lb], pdelta=p[lb+1], pgamma=p[(lth-qq):lth])
+
+
+  ltval <- list(tbeta=tval[1:lb])
+  lp <- list(pbeta=p[1:lb])
 
 
   JmdlMod(opt=lopt, args=args, std = lstd, tval=ltval, p=lp, q=q, family=family, offset=offset, mc=mcout)
@@ -441,8 +444,7 @@ print.jmdlMod <- function(x, digits = 4)
   print(mp , digits = digits, print.gap = 2L, quote = FALSE)
 
   if(dims["Nbinom"]==1){
-    odp = data.frame(Estimate = drop(x@opt$delta), Std.Error = drop(x@std$stddelta),
-                       t.value = drop(x@tval$tdelta), p.value = drop(x@p$pdelta) )
+    odp = data.frame(Estimate = drop(x@opt$delta), Std.Error = drop(x@std$stddelta))
     row.names(odp)<-c("delta")
     cat("\n Over-dispersion Parameter:\n")
     print(odp, digits = digits, print.gap = 2L, quote = FALSE)
@@ -450,8 +452,7 @@ print.jmdlMod <- function(x, digits = 4)
 
   cat("\n Correlation Parameters:\n")
 
-  cp = data.frame(Estimate = drop(x@opt$gamma), Std.Error = drop(x@std$stdgamma),
-                    t.value = drop(x@tval$tgamma), p.value = drop(x@p$pgamma) )
+  cp = data.frame(Estimate = drop(x@opt$gamma), Std.Error = drop(x@std$stdgamma))
 
   row.names(cp)<- c(paste("gamma",1:length(drop(x@opt$gamma))))
   print(cp, digits = digits, print.gap = 2L, quote = FALSE)
@@ -485,8 +486,7 @@ summary.jmdlMod <- function(x, digits = 4)
   print(mp , digits = digits, print.gap = 2L, quote = FALSE)
 
   if(dims["Nbinom"]==1){
-    odp = data.frame(Estimate = drop(x@opt$delta), Std.Error = drop(x@std$stddelta),
-                     lrt = drop(x@tval$tdelta), p.value = drop(x@p$pdelta) )
+    odp = data.frame(Estimate = drop(x@opt$delta), Std.Error = drop(x@std$stddelta))
     row.names(odp)<-c("delta")
     cat("\n Over-dispersion Parameter:\n")
     print(odp, digits = digits, print.gap = 2L, quote = FALSE)
@@ -494,8 +494,7 @@ summary.jmdlMod <- function(x, digits = 4)
 
   cat("\n Correlation Parameters:\n")
 
-  cp = data.frame(Estimate = drop(x@opt$gamma), Std.Error = drop(x@std$stdgamma),
-                  lrt = drop(x@tval$tgamma), p.value = drop(x@p$pgamma) )
+  cp = data.frame(Estimate = drop(x@opt$gamma), Std.Error = drop(x@std$stdgamma))
 
   row.names(cp)<- c(paste("gamma",1:length(drop(x@opt$gamma))))
   print(cp, digits = digits, print.gap = 2L, quote = FALSE)

@@ -633,9 +633,9 @@ cat.f <- function(...){ cat(..., fill = TRUE)}
 
 
 #p.test
-p.test <- function(id, theta0, opt, std, family=family){
+p.test <- function(id, theta0, opt, std, n, p, family=family){
   theta = opt$par[id]
   tval = (theta-theta0)/std[id]
-  pval = 1 - pt(tval, df = 1)
+  pval = 1 - pt(tval, df = n-p)
   return(list(tval=tval, pval=pval))
 }

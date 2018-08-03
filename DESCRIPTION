@@ -2,7 +2,7 @@ Package: jmdl
 Type: Package
 Title: Joint Mean-Correlation Regression Approach for Discrete
         Longitudinal Data
-Version: 0.1.0
+Version: 0.2.0
 Author: Jane Lee
 Maintainer: Jane Lee <mote@mail.ustc.edu.cn>
 Description: Fit joint mean-correlation models for discrete longitudinal data (Tang CY,Zhang W,
@@ -14,6 +14,6 @@ Depends: R (>= 3.4.0)
 Imports: Formula, methods, minqa, boot, mnormt, MASS, mvtnorm, abind
 NeedsCompilation: yes
 RoxygenNote: 6.0.1
-Packaged: 2018-07-31 13:37:36 UTC; ThinkPad
+Packaged: 2018-08-03 12:21:43 UTC; ThinkPad
 Repository: CRAN
-Date/Publication: 2018-07-31 15:50:17 UTC
+Date/Publication: 2018-08-03 16:50:17 UTC

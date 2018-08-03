@@ -1,8 +1,8 @@
-54142dc9bde388acbce89d5424f5cb9b *DESCRIPTION
+d6b6557b70b21da7947bed30fa4208e3 *DESCRIPTION
 cb219d81a9ecc71a089369428a2f6c98 *NAMESPACE
 847bac470f238e16f8e53dc1b6cc3391 *R/class.R
-ce0404276d019b8a18ef15ff1bb82965 *R/consistent.R
-31f71e8602095f7af6bfa915ba798b2b *R/jmdl.R
+96964cb99b3181b975c67641e9db31c6 *R/consistent.R
+4a9ef0ad125d4b5cfbe1102921acb493 *R/jmdl.R
 ab7d501d0d02a36a6e64031b9f5f4963 *R/model.R
 265eb2fe0e9fbbf4e1ec5946a59abe9d *R/utilite.R
 1b478b69dce5a04f321457372ba4dc18 *data/epilepsy2.rda
