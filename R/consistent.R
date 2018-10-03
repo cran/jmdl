@@ -396,8 +396,9 @@ cond.comlik <- function(theta,theta0,id, m, Y, X, W, family, offset)
   #m: measurement vector of lengt n
   n<-length(m)
   p<-ncol(X)
+  idl = length(id)
 
-  if(id <= p) {
+  if(id[idl] <= p) {
     full.theta<-rep(0,length(theta)+length(theta0))
     full.theta[id]<-theta0
     full.theta[-id]<-theta

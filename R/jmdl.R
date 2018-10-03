@@ -327,7 +327,7 @@ OptimizeJmdl <- function(m, Y, X, W, time, offset = NULL, theta = NULL, family)
     if (family == 'Bernoulli') {
       if (missStart) {
         Yv<-na.exclude(as.vector(t(Y)))
-        lm.obj <- glm(Yv ~ offset(offset) + X-1 ,family=binomial)
+        lm.obj <- glm(Yv ~ offset(offset) + X-1 ,family='binomial')
         bta0 <- coef(lm.obj)
         gma0 <- rep(0, lgma)
         theta <- c(bta0, gma0)

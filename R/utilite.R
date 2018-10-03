@@ -73,8 +73,6 @@ getJMDL.jmdlMod <- function(object,
   if (devcomp$dims['Poisson'])   family <- 'Poisson'
   if (devcomp$dims['Nbinom'])    family <- 'Nbinom'
 
-  if (all(offset==c(rep(0,length(time))))) offset <- NULL
-
   switch(name,
          "m" = args$m,
          "Y" = args$Y,
@@ -375,7 +373,6 @@ lrt.test <- function(fit, id){
 
   lgma<-dim(W)[4]
   Yv<-na.exclude(as.vector(t(Y)))
-  lrt1<-lrt.full
 
   ##Bernoulli
   if(family == 'Bernoulli'){
@@ -384,6 +381,12 @@ lrt.test <- function(fit, id){
     theta<-c(coef(y.fit0),rep(0,lgma))
     lrt0<-minqa::bobyqa(par=theta,fn=cond.comlik, theta0=theta0,id=id,Y=Y,X=X,W=W,m=m,
                         family=family, offset=offset)
+
+    lm.obj <- glm(Yv ~ offset(offset) + X-1 ,family='binomial')
+    bta1 <- coef(lm.obj)
+    gma1 <- rep(0, lgma)
+    theta1 <- c(bta1, gma1)
+    lrt1<-minqa::bobyqa(par=theta1,fn=comlik,m=m,Y=Y,X=X,W=W,family=family,offset=offset)
   }
 
   ##Poisson
@@ -393,26 +396,39 @@ lrt.test <- function(fit, id){
     theta<-c(coef(y.fit0),rep(0,lgma))
     lrt0<-minqa::bobyqa(par=theta,fn=cond.comlik, theta0=theta0, id=id,Y=Y,X=X,W=W,m=m,
                         family=family, offset=offset)
+
+    lm.obj <- glm(Yv ~ offset(offset) + X-1 ,family='poisson')
+    bta1 <- coef(lm.obj)
+    gma1 <- rep(0, lgma)
+    theta1 <- c(bta1, gma1)
+    lrt1<-minqa::bobyqa(par=theta1,fn=comlik,m=m,Y=Y,X=X,W=W,family=family,offset=offset)
   }
 
   ##Nbinom
   if(family == 'Nbinom'){
     lbta = ncol(X)
-    if(id==(lbta+1)) return(list(lrt=NA, pval=NA, critval=NA))
+    if(sum(id==(lbta+1))) return(list(lrt=NA, pval=NA, critval=NA))
     #null comlik estimation
     y.fit0<-MASS::glm.nb(Yv~offset(offset)+X[,-id]-1)
     theta<-c(coef(y.fit0),y.fit0$theta,rep(0,lgma))
     lrt0<-minqa::bobyqa(par=theta,fn=cond.comlik, theta0=theta0, id=id,Y=Y,X=X,W=W,m=m,
                         family=family,offset=offset)
+
+    lm.obj <- MASS::glm.nb(Yv ~ offset(offset) + X-1)
+    bta1 <- coef(lm.obj)
+    gma1 <- rep(0, lgma)
+    theta1 <- c(bta1, lm.obj$theta, gma1)
+    lrt1<-minqa::bobyqa(par=theta1,fn=comlik,m=m,Y=Y,X=X,W=W,family=family,offset=offset)
   }
 
-  lrt<-2*(lrt0$fval-lrt1$loglik)
+  lrt<-2*(lrt0$fval-lrt1$fval)
 
-  theta<-rep(0,length(lrt1$theta))
+  theta<-rep(0,length(lrt1$par))
   theta[id]<-theta0
-  theta[-id]<-lrt1$theta[-id]
+  theta[-id]<-lrt1$par[-id]
 
   #pvalue
+  #set.seed(1234)
   cov.fit0<-asycov(m=m,Y=Y,X=X,W=W,family=family,theta=theta,offset=offset)
   chimat<-matrix(rchisq(length(id)*10000, df=1),ncol=length(id))
   if(length(id)==1){
@@ -424,5 +440,5 @@ lrt.test <- function(fit, id){
   }
   a<-as.vector(a)
   pval<-sum(a>lrt)/10000
-  return(list(lrt=lrt, pval=pval, critval=quantile(a,0.95)))
+  return(list(lrt.statistic=lrt, pval=pval, critval=round(quantile(a,c(0.025, 0.975)), 4))) #up 95% quantile
 }
